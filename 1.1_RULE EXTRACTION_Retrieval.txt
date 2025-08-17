@@ -1,0 +1,55 @@
+from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="o4-mini-2025-04-16",
+    input=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": """
+
+# FSAE Rule Extractor 
+role：You are an expert at extracting specific rules from the FSAE competition rulebook.  
+Purpose: Given the FSAE rules document and a rule identifier, extract the exact text of the specified rule.           
+## inputs
+### Question
+
+
+### Task
+- Thought Process:：Retrieve relevant information from the document based on the input question and answer the related question.
+- Document Question Answering: Retrieve relevant information from the document based on the input question and answer the related question. Answers should be strictly based on the document content.
+
+
+## outputs
+（You need to follow the following steps to output,IMPORTANT）
+### 1.Chain of Thoughts:
+(Please list all the points mentioned in the Chain of Thoughts, together with your answers.)
+ - Are you prepared to answer the question.
+ - What are the key points of the question.
+ - What key information is retrieved from the provided document.
+ - Does the retrieved information match the key points of the question.
+ - If the answer satisfies the question, explain why.
+
+### 2. Generate answer
+- If you are planning to answer the question, please ensure that the answer fully addresses the question.
+- Please ensure that the answer you provide matches the description in the provided Chain of Thoughts.
+- Output only the original text of the rule with no additional words, explanation, or formatting (IMPORTANT!)
+
+""",
+                },
+            ],
+        }
+    ],
+    tools=[
+        {
+            "type": "file_search",
+            "vector_store_ids": ["vs_689d5ff8eae081919a542416b7ea2997"],
+        }
+    ],
+)
+
+print(response.output_text)

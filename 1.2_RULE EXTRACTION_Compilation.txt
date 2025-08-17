@@ -1,0 +1,60 @@
+from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="o4-mini-2025-04-16",
+    input=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "input_text",
+                    "text": """
+
+# FSAE Aerodynamic Rule Finder
+role：ou are an expert at identifying all rules in the FSAE competition rulebook relevant to a given keyword or concept.
+Purpose: Given the FSAE rules document and a keyword, extract the rule numbers of all rules that contain that keyword.         
+## inputs
+### Question
+We are a student engineering team designing a vehicle for the FSAE competition. Attached is the FSAE rules document. Please list all rules relevant to Tractive System. Answer with only the rule numbers (i.e.: AA.1.1.1) separated by commas and no other words. The rules relevant to Tractive System are:
+
+### Task
+- Thought Process:：Retrieve relevant information from the document based on the input question and answer the related question.
+- Document Question Answering: Retrieve relevant information from the document based on the input question and summarize all the rules. Answers must be strictly based on the document content and strictly follow the required format.
+
+
+## outputs
+（You need to follow the following steps to output,IMPORTANT）
+### 1.Chain of Thoughts:
+(Please list all the points mentioned in the Chain of Thoughts, together with your answers.)
+ - （A）Are you prepared to answer the question.
+ - (B)Search only for the exact word or phrase that appears after “Please list all rules relevant to” in the question, and treat it as the key term. It must match the original exactly (including spaces and singular/plural form), with no expansion, inference, modification, or morphological changes. The search is case-insensitive. (MUST!)
+
+- Execute the following steps (1)–(3) in order:
+- (1) When performing a full-text search, a rule number may only be extracted if the search term exactly matches a word in the document.
+-(2) For each rule number entry (Rule Number A) extracted in step (1), if the full text of Rule Number A contains or references another rule number (Rule Number B), then Rule Number B must also be extracted (this requirement is critical).
+- (3) Extract all rule numbers from the Table of Contents that contain the exact same search term.
+### 2. Generate answer
+- If you intend to answer the question, please ensure that the compilation result is neither missing any items nor containing duplicates.
+- Please ensure that the rule numbers you provide matches the description in the provided Chain of Thoughts.
+- Output only the original text of the rule with no additional words, explanation, or formatting (IMPORTANT!)
+- In this part, the output should be generated as the following Reference Output format without other information，and no other words (MOST IMPORTANT):
+、、、Reference Output Format
+  ['F.10.4.2', 'T.9.2.3', 'T.9.2.4', 'IC.9.3.1', 'EV.1.2', 'EV.6.6.2', 'EV.6.6.3', 'EV.7.7.1', 'EV.6.6.1', 'EV.7.2.1', 'EV.4.5']
+、、、
+
+""",
+                },
+            ],
+        }
+    ],
+    tools=[
+        {
+            "type": "file_search",
+            "vector_store_ids": ["vs_689d5ff8eae081919a542416b7ea2997"],
+        }
+    ],
+)
+
+print(response.output_text)
